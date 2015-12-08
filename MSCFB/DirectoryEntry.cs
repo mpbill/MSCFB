@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MSCFB
 {
-    class DirectoryEntry
+    public class DirectoryEntry
     {
         public uint StartingSectorLocation { get; private set; }
         public ulong StreamSize { get; private set; }

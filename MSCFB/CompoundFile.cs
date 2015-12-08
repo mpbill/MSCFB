@@ -54,11 +54,21 @@ namespace MSCFB
                 }
             }
             
-            var directSect = Sectors[2];
-            var dirEntryOne = directSect.SectorBytes.Take(512 / 4).ToArray();
-            DirectoryEntry directoryEntry = new DirectoryEntry(dirEntryOne);
-            Console.WriteLine("");
             
+            DirectorySector sector = new DirectorySector(Sectors[2].SectorBytes, Header.MajorVersion);
+            Console.WriteLine("");
+            DirectorySector sector2 = new DirectorySector(Sectors[3].SectorBytes, MajorVersion.Version3);
+
+
+            var fatSecOne = Sectors[3];
+            var nextSect = BitConverter.ToUInt32(fatSecOne.SectorBytes, 0);
+            for (int i = 0; i < Sectors.Count; i++)
+            {
+                DirectorySector sector3 = new DirectorySector(Sectors[i].SectorBytes, MajorVersion.Version3);
+            }
+
+            Console.WriteLine("");
+
         }
 
 

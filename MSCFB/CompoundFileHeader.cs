@@ -195,7 +195,8 @@ namespace MSCFB
             //Reserved (6 bytes): This field MUST be set to all zeroes.
             if (!Enumerable.SequenceEqual(FileReader.ReadBytes(6), Resources.HeaderSectionReserved))
                 throw new InvalidMcdfHeaderException("Reserved Section was not set to all zeroes.");
-            NumberOfDirectorySectors = BitConverter.ToUInt32(FileReader.ReadBytes(4), 0);
+            var t = FileReader.ReadBytes(4);
+            NumberOfDirectorySectors = BitConverter.ToUInt32(t, 0);
             if (MajorVersion == MajorVersion.Version3 && NumberOfDirectorySectors != 0)
                 throw new InvalidMcdfHeaderException("Major Version 3 does not support NumberOfDirectorySectors field.");
             NumberOfFatSectors = BitConverter.ToUInt32(FileReader.ReadBytes(4), 0);

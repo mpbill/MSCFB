@@ -46,8 +46,10 @@
     <Compile Include="CompoundFile.cs" />
     <Compile Include="CompoundFileHeader.cs" />
     <Compile Include="CompoundFileSector.cs" />
+    <Compile Include="DirectoryChain.cs" />
     <Compile Include="DirectoryEntry.cs" />
     <Compile Include="DirectoryEntryObjectType.cs" />
+    <Compile Include="DirectorySector.cs" />
     <Compile Include="InvalidMcdfHeaderException.cs" />
     <Compile Include="MajorVersion.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
