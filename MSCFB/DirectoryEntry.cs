@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MSCFB.Enum;
 
 namespace MSCFB
 {
@@ -11,8 +12,6 @@ namespace MSCFB
     {
         public uint StartingSectorLocation { get; private set; }
         public ulong StreamSize { get; private set; }
-
-
         public byte[] ModifiedTime { get; private set; }
         public byte[] CreationTime { get; private set; }
         public byte[] StateBits { get; private set; }
@@ -20,16 +19,20 @@ namespace MSCFB
         public uint ChildID { get; private set; }
         public uint LeftSiblingID { get; private set; }
         public uint RightSiblingID { get; private set; }
+        public DirectoryEntry LeftSiblingDirectoryEntry { get; set; }
+        public DirectoryEntry RightSiblingDirectoryEntry { get;  set; }
+        public DirectoryEntry ChildDirectoryEntry { get; set; }
         public ColorFlag ColorFlag { get; private set; }
         public DirectoryEntryObjectType ObjectType { get; private set; }
         public byte[] DirectoryEntryBytes { get; private set; }
-        public string Name { get; private set; }
+        public string RawName { get; private set; }
+        public string Name { get { return RawName.TrimEnd(new char[1] {'\0'}); } }
         public ushort NameLength { get; private set; }
-        public DirectoryEntry(byte[] directoryEntryBytes)
+        public DirectoryEntry(byte[] bytes)
         {
-            this.DirectoryEntryBytes = directoryEntryBytes;
+            DirectoryEntryBytes = bytes;
             BinaryReader br = new BinaryReader(new MemoryStream(DirectoryEntryBytes));
-            Name = Encoding.Unicode.GetString(br.ReadBytes(64));
+            RawName = Encoding.Unicode.GetString(br.ReadBytes(64));
             NameLength = BitConverter.ToUInt16(br.ReadBytes(2), 0);
             ObjectType = (DirectoryEntryObjectType)br.ReadByte();
             ColorFlag = (ColorFlag)br.ReadByte();

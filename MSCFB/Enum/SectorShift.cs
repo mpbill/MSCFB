@@ -1,4 +1,6 @@
-﻿namespace MSCFB
+﻿using MSCFB.Enum;
+
+namespace MSCFB
 {
     /// <summary>
     /// Sector Shift (2 bytes): This field MUST be set to 0x0009, or 0x000c, depending on the Major Version field.

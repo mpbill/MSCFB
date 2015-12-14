@@ -40,24 +40,26 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ByteOrder.cs" />
-    <Compile Include="Class1.cs" />
-    <Compile Include="ColorFlag.cs" />
+    <Compile Include="DirectoryChain.cs" />
+    <Compile Include="Enum\ByteOrder.cs" />
+    <Compile Include="Enum\ColorFlag.cs" />
     <Compile Include="CompoundFile.cs" />
     <Compile Include="CompoundFileHeader.cs" />
     <Compile Include="CompoundFileSector.cs" />
-    <Compile Include="DirectoryChain.cs" />
     <Compile Include="DirectoryEntry.cs" />
-    <Compile Include="DirectoryEntryObjectType.cs" />
+    <Compile Include="Enum\DirectoryEntryObjectType.cs" />
     <Compile Include="DirectorySector.cs" />
-    <Compile Include="InvalidMcdfHeaderException.cs" />
-    <Compile Include="MajorVersion.cs" />
+    <Compile Include="Enum\MajorVersion.cs" />
+    <Compile Include="Enum\StreamID.cs" />
+    <Compile Include="Exception\InvalidMcdfHeaderException.cs" />
+    <Compile Include="FatSector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Resources.cs" />
-    <Compile Include="SectorTypes.cs" />
-    <Compile Include="SectorShift.cs" />
-    <Compile Include="SectorSizeFileLengthException.cs" />
+    <Compile Include="Static\Resources.cs" />
+    <Compile Include="Enum\SectorType.cs" />
+    <Compile Include="Enum\SectorShift.cs" />
+    <Compile Include="Exception\SectorSizeFileLengthException.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

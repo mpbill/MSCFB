@@ -4,14 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using MSCFB.Enum;
+
 namespace MSCFB
 {
     public class CompoundFile
     {
-        private CompoundFileHeader Header { get; set; }
+        public CompoundFileHeader Header { get; private set; }
         private Stream FileStream { get; set; }
-        private BinaryReader FileReader { get; set; }
-        
+        public BinaryReader FileReader { get; private set; }
+        public FatSectorChain FatSectorChain { get; private set; }
+        public DirectoryChain DirectoryChain { get; private set; }
         public CompoundFile(Stream fileStream)
         {
             FileStream = fileStream;
@@ -23,54 +26,30 @@ namespace MSCFB
         private void Load()
         {
             Header = new CompoundFileHeader(FileReader);
-            List<CompoundFileSector> Sectors = new List<CompoundFileSector>(200);
-            switch(Header.SectorShift)
-            {
-                case SectorShift.Shift512:
-                {
-                        
-                        if (FileStream.Length%512!=0)
-                            throw new SectorSizeFileLengthException();
-                        while (FileStream.Position != FileStream.Length)
-                        {
-                            Sectors.Add(new CompoundFileSector(FileReader.ReadBytes(512)));
-                        }
-
-                        break;
-                }
-                case SectorShift.Shift4096:
-                {
-                        if(FileStream.Length % 4096 != 0)
-                            throw new SectorSizeFileLengthException();
-                        while (FileStream.Position != FileStream.Length)
-                        {
-                            Sectors.Add(new CompoundFileSector(FileReader.ReadBytes(4096)));
-                        }
-                        break;
-                }
-                default:
-                {
-                        break;
-                }
-            }
-            
-            
-            DirectorySector sector = new DirectorySector(Sectors[2].SectorBytes, Header.MajorVersion);
-            Console.WriteLine("");
-            DirectorySector sector2 = new DirectorySector(Sectors[3].SectorBytes, MajorVersion.Version3);
-
-
-            var fatSecOne = Sectors[3];
-            var nextSect = BitConverter.ToUInt32(fatSecOne.SectorBytes, 0);
-            for (int i = 0; i < Sectors.Count; i++)
-            {
-                DirectorySector sector3 = new DirectorySector(Sectors[i].SectorBytes, MajorVersion.Version3);
-            }
-
-            Console.WriteLine("");
-
+            FatSectorChain = new FatSectorChain(this);
+            DirectoryChain = new DirectoryChain(this);
+            return;
         }
 
+        internal UInt32 SectorNumberToOffset(uint sectorNumber)
+        {
+            return (sectorNumber + 1)*512;
+        }
+        internal void MoveReaderToSector(uint sectorNumber)
+        {
+            MoveReaderToPosition(SectorNumberToOffset(sectorNumber));
+        }
+
+        internal void MoveReaderToPosition(uint position)
+        {
+            FileReader.BaseStream.Position = position;
+        }
+
+        internal byte[] ReadSector(uint sectorNumber)
+        {
+            MoveReaderToSector(sectorNumber);
+            return FileReader.ReadBytes((int) Resources.UIntPow(2, (uint) Header.SectorShift));
+        }
 
     }
 }

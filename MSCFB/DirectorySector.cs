@@ -1,13 +1,22 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using MSCFB.Enum;
+using MSCFB.Exception;
 
 namespace MSCFB
 {
     public class DirectorySector
     {
+
+        public CompoundFile CompoundFile { get; private set; }
+        public uint SectorNumber { get; private set; }
         public DirectoryEntry[] DirectoryEntries { get; private set; }
-        public DirectorySector(byte[] bytes, MajorVersion Version)
+        public DirectorySector(uint sectorNumber, CompoundFile compoundFile)
         {
-            switch (Version)
+            SectorNumber = sectorNumber;
+            CompoundFile = compoundFile;
+            var bytes = CompoundFile.ReadSector(sectorNumber);
+            switch (CompoundFile.Header.MajorVersion)
             {
                 default:
                 {

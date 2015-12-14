@@ -2,7 +2,7 @@
 
 namespace MSCFB
 {
-    class SectorSizeFileLengthException:Exception
+    class SectorSizeFileLengthException:System.Exception
     {
         public SectorSizeFileLengthException():base()
         {

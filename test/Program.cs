@@ -17,12 +17,12 @@ namespace test
             using (var fs = File.OpenRead("empty.msg"))
             {
                 CompoundFile f = new CompoundFile(fs);
-                
+                Console.WriteLine(Resources.UIntPow(2,9));
                 return;
+
             }
 
         }
+        
     }
-    
-    
 }

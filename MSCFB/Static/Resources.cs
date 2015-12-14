@@ -44,6 +44,12 @@ namespace MSCFB
         {
             get { return _mcdfHeaderClsid; }
         }
-
+        public static UInt32 UIntPow(UInt32 a, UInt32 b)
+        {
+            UInt32 result = 1;
+            for (long i = 0; i < b; i++)
+                result *= a;
+            return result;
+        }
     }
 }

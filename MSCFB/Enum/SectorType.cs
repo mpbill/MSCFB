@@ -1,34 +1,34 @@
 ﻿namespace MSCFB
 {
-    public enum SectorTypes
+    /// <summary>
+    /// REGSECT         0x00000000 - 0xFFFFFFF9     When cast to this enum, regular sector numbers will be represented without a name.
+    /// </summary>
+    public enum SectorType : uint
     {
-        /// <summary>
-        /// REGSECT         0x00000000 - 0xFFFFFFF9     Regular sector number.
-        /// </summary>
-        RegSect,
+        
         /// <summary>
         /// MAXREGSECT      0xFFFFFFFA                  Maximum regular sector number.
         /// </summary>
-        MaxRegSect,
+        MaxRegSect= 0xFFFFFFFA,
         /// <summary>
         /// Not applicable  0xFFFFFFFB                  Reserved for future use.
         /// </summary>
-        NotApplicable,
+        NotApplicable= 0xFFFFFFFB,
         /// <summary>
         /// DIFSECT         0xFFFFFFFC                  Specifies a DIFAT sector in the FAT.
         /// </summary>
-        DifSect,
+        DifSect= 0xFFFFFFFC,
         /// <summary>
         /// FATSECT         0xFFFFFFFD                  Specifies a FAT sector in the FAT.
         /// </summary>
-        FatSect,
+        FatSect= 0xFFFFFFFD,
         /// <summary>
         /// ENDOFCHAIN      0xFFFFFFFE                  End of a linked chain of sectors.
         /// </summary>
-        EndOfChain,
+        EndOfChain= 0xFFFFFFFE,
         /// <summary>
         /// FREESECT        0xFFFFFFFF                  Specifies an unallocated sector in the FAT, Mini FAT, or DIFAT.
         /// </summary>
-        FreeSect
+        FreeSect= 0xFFFFFFFF
     }
 }
