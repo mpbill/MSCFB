@@ -1,24 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace MSCFB
+namespace MSCFB.Chains
 {
     public class DifatChain
     {
         public CompoundFile CompoundFile { get; private set; }
-        private List<SectorType> SectorNumbers { get; set; }
-        public uint this[int index]
+        public SectorType this[SectorType index]
         {
-            get { return (uint)SectorNumbers[index]; }
+            get
+            {
+                if (index < (SectorType)CompoundFile.Header.DifatArray.Count - 1)
+                    return CompoundFile.Header.DifatArray[(int)index];
+                else if()
+            }
             set { SectorNumbers[index] = (SectorType)value; }
+        }
+        public uint this[uint index]
+        {
+            get
+            {
+                
+            }
+            set { }
         }
         public DifatChain(CompoundFile compoundFile)
         {
             CompoundFile = compoundFile;
-            SectorNumbers = new List<SectorType>(CompoundFile.Header.DifatArray);
             AddNextSector();
 
 

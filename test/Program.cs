@@ -13,7 +13,6 @@ namespace test
     {
         static void Main(string[] args)
         {
-
             using (var fs = File.OpenRead("empty.msg"))
             {
                 CompoundFile f = new CompoundFile(fs);

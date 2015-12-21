@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
-namespace MSCFB
+namespace MSCFB.Chains
 {
     public class MiniFatChain
     {
@@ -14,15 +10,18 @@ namespace MSCFB
         {
             CompoundFile = compoundFile;
             SectorNumbers = new List<uint>();
+            SectorType NextSector = SectorType.EndOfChain;
             if (CompoundFile.Header.FirstMiniFatSectorLocation <= SectorType.MaxRegSect)
             {
+                SectorNumbers.Capacity += (int)(CompoundFile.Header.SectorSize/4);
                 CompoundFile.MoveReaderToSector((uint)CompoundFile.Header.FirstMiniFatSectorLocation);
                 for(int i = 0; i < CompoundFile.Header.SectorSize / 4; i++)
                 {
                     SectorNumbers.Add(CompoundFile.FileReader.ReadUInt32());
                 }
+                //SectorType = CompoundFile.FatSectorChain[]
             }
-            CompoundFile.
+            //CompoundFile.
 
         }
     }

@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MSCFB.Enum;
 
-namespace MSCFB
+namespace MSCFB.Chains
 {
     public class DirectoryChain
     {

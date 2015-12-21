@@ -1,18 +1,17 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using MSCFB.Enum;
-namespace MSCFB
+﻿using System.Collections.Generic;
+
+namespace MSCFB.Chains
 {
     public class FatSectorChain
     {
         public CompoundFile CompoundFile { get; private set; }
+        private SortedDictionary<SectorType, SectorType> SectorsDict { get; set; } 
         public List<SectorType> SectorsList { get; private set; }
+        private SectorType NextIndex { get; set; } = (SectorType) 0;
         public FatSectorChain(CompoundFile compoundFile)
         {
             this.CompoundFile = compoundFile;
+            SectorsDict = new SortedDictionary<SectorType, SectorType>();
             SectorsList = new List<SectorType>();
             LoadSectors();
             
@@ -27,15 +26,20 @@ namespace MSCFB
             CompoundFile.MoveReaderToSector((uint)CompoundFile.Header.DifatArray[0]);
             while (true)
             {
-                var bytes =
-                    CompoundFile.FileReader.ReadBytes(
-                        (int) Resources.UIntPow(2, (UInt32) CompoundFile.Header.SectorShift));
-                for (int i = 0; i < bytes.Length/4; i++)
+                
+                for (int i = 0; i < CompoundFile.Header.SectorSize/4; i++)
                 {
-                    SectorsList.Add((SectorType) BitConverter.ToUInt32(bytes.Skip(i*4).Take(4).ToArray(), 0));
+                    this.Add((SectorType) CompoundFile.FileReader.ReadUInt32());
                 }
                 break;
             }
+        }
+
+        public void Add(SectorType sectorType)
+        {
+            
+            SectorsDict.Add(NextIndex, sectorType);
+            NextIndex++;
         }
 
         //public byte[] this[int index]

@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using MSCFB.Chains;
 using MSCFB.Enum;
-
 namespace MSCFB
 {
     public class CompoundFile
@@ -13,15 +13,24 @@ namespace MSCFB
         public CompoundFileHeader Header { get; private set; }
         private Stream FileStream { get; set; }
         public BinaryReader FileReader { get; private set; }
+        public BinaryWriter FileWriter { get; private set; }
         public FatSectorChain FatSectorChain { get; private set; }
         public DifatChain DifatChain { get; private set; }
         public DirectoryChain DirectoryChain { get; private set; }
         public DirectoryEntry RootDirectoryEntry { get; private set; }
+        public bool CanWrite { get; private set; }
+        public MiniFatChain MiniFatChain { get; private set; }
         public CompoundFile(Stream fileStream)
         {
             FileStream = fileStream;
             FileStream.Seek(0, SeekOrigin.Begin);
             FileReader = new BinaryReader(FileStream);
+            if (FileStream.CanWrite)
+            {
+                FileWriter = new BinaryWriter(FileStream);
+                CanWrite = true;
+            }
+            CanWrite = false;
             Load();
         }
 
@@ -31,6 +40,7 @@ namespace MSCFB
             DifatChain = new DifatChain(this);
             FatSectorChain = new FatSectorChain(this);
             DirectoryChain = new DirectoryChain(this);
+            MiniFatChain = new MiniFatChain(this);
             RootDirectoryEntry = new DirectoryEntry(this, 0);
             return;
         }

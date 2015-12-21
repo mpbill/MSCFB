@@ -1,17 +1,16 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{EFB390A2-E5E9-4B3C-98A1-5B91C678E80C}</ProjectGuid>
+    <ProjectGuid>aecc73af-d1b9-4a0b-8b29-19aae34a8cfd</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MSCFB</RootNamespace>
-    <AssemblyName>MSCFB</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <RootNamespace>RedBlackTree</RootNamespace>
+    <AssemblyName>RedBlackTree</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -31,38 +30,25 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
+    <Reference Include="System"/>
+    
+    <Reference Include="System.Core"/>
+    <Reference Include="System.Xml.Linq"/>
+    <Reference Include="System.Data.DataSetExtensions"/>
+    
+    
+    <Reference Include="Microsoft.CSharp"/>
+    
+    <Reference Include="System.Data"/>
+    
+    <Reference Include="System.Net.Http"/>
+    
+    <Reference Include="System.Xml"/>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Chains\DifatChain.cs" />
-    <Compile Include="Chains\DirectoryChain.cs" />
-    <Compile Include="Chains\DirectoryEntry.cs" />
-    <Compile Include="Chains\FatSector.cs" />
-    <Compile Include="Chains\MiniFatChain.cs" />
-    <Compile Include="Enum\ByteOrder.cs" />
-    <Compile Include="Enum\ColorFlag.cs" />
-    <Compile Include="CompoundFile.cs" />
-    <Compile Include="CompoundFileHeader.cs" />
-    <Compile Include="CompoundFileSector.cs" />
-    <Compile Include="Enum\DirectoryEntryObjectType.cs" />
-    <Compile Include="Enum\MajorVersion.cs" />
-    <Compile Include="Enum\StreamID.cs" />
-    <Compile Include="Exception\InvalidMcdfHeaderException.cs" />
+    <Compile Include="Class1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Static\Extensions.cs" />
-    <Compile Include="Static\Resources.cs" />
-    <Compile Include="Enum\SectorType.cs" />
-    <Compile Include="Enum\SectorShift.cs" />
-    <Compile Include="Exception\SectorSizeFileLengthException.cs" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
@@ -71,4 +57,5 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-</Project>
+
+ </Project>
