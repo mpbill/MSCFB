@@ -7,6 +7,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSCFB", "MSCFB\MSCFB.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "test", "test\test.csproj", "{86C02D9A-E944-4ED3-9E45-CC37F36C6513}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Emails", "Emails", "{F3D4AF78-86C5-4DAB-88D9-50784BEE4445}"
+	ProjectSection(SolutionItems) = preProject
+		test\empty.msg = test\empty.msg
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

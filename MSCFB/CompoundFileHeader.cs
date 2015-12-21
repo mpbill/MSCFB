@@ -83,6 +83,8 @@ namespace MSCFB
             get { return _byteOrder; }
         }
 
+        public uint SectorSize { get; private set; }
+
         /// <summary>
         /// Major Version (2 bytes): Version number for breaking changes. This field MUST be set to either 0x0003 (version 3) or 0x0004 (version 4).
         /// </summary>
@@ -146,14 +148,14 @@ namespace MSCFB
                     {
                         if (MajorVersion != MajorVersion.Version3)
                             throw new InvalidMcdfHeaderException("Sector shift section was 0x0009 but Major Version was not 0x003");
-                        
+                        SectorSize = 512;
                         break;
                     }
                 case SectorShift.Shift4096:
                     {
                         if (MajorVersion != MajorVersion.Version4)
                             throw new InvalidMcdfHeaderException("Sector shift section was 0x000C but Major Version was not 0x004");
-                        
+                        SectorSize = 4096;
                         break;
                     }
                 default:

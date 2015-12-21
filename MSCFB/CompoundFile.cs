@@ -14,7 +14,9 @@ namespace MSCFB
         private Stream FileStream { get; set; }
         public BinaryReader FileReader { get; private set; }
         public FatSectorChain FatSectorChain { get; private set; }
+        public DifatChain DifatChain { get; private set; }
         public DirectoryChain DirectoryChain { get; private set; }
+        public DirectoryEntry RootDirectoryEntry { get; private set; }
         public CompoundFile(Stream fileStream)
         {
             FileStream = fileStream;
@@ -26,8 +28,10 @@ namespace MSCFB
         private void Load()
         {
             Header = new CompoundFileHeader(FileReader);
+            DifatChain = new DifatChain(this);
             FatSectorChain = new FatSectorChain(this);
             DirectoryChain = new DirectoryChain(this);
+            RootDirectoryEntry = new DirectoryEntry(this, 0);
             return;
         }
 
@@ -50,6 +54,33 @@ namespace MSCFB
             MoveReaderToSector(sectorNumber);
             return FileReader.ReadBytes((int) Resources.UIntPow(2, (uint) Header.SectorShift));
         }
+        internal void MoveReaderToDirectoryEntry(uint index)
+        {
+            int Modulus;
+            
+            switch (Header.MajorVersion)
+            {
+                case (MajorVersion.Version3):
+                {
+                        Modulus =(int)index % 4;
+                        MoveReaderToSector(DirectoryChain[(int)index/4]);
+                        FileReader.BaseStream.Seek(Modulus * 128, SeekOrigin.Current);
+                        break;
+                }
+                default:
+                {
+                        Modulus = (int)index % 16;
+                        MoveReaderToSector(DirectoryChain[(int)index / 16]);
+                        FileReader.BaseStream.Seek(Modulus * 128, SeekOrigin.Current);
+                        break;
+                }
+            }
 
+        }
+        internal byte[] ReadDirectoryEntry(uint index)
+        {
+            MoveReaderToDirectoryEntry(index);
+            return FileReader.ReadBytes(128);
+        }
     }
 }

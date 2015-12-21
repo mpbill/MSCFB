@@ -1,31 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MSCFB.Enum;
 
 namespace MSCFB
 {
     public class DirectoryChain
     {
         public CompoundFile CompoundFile { get; private set; }
-        public List<DirectorySector> DirectorySectors { get; private set; }
+        private List<uint> SectorNumbers { get; set; } 
+        public uint this[int index]
+        {
+            get
+            {
+                return SectorNumbers[index];
+            }
+            set
+            {
+                SectorNumbers[index] = value;
+            }
+        }
         public DirectoryChain(CompoundFile compoundFile)
         {
             CompoundFile = compoundFile;
-            DirectorySectors = new List<DirectorySector>();
-            DirectorySectors.Add(new DirectorySector((uint)CompoundFile.Header.FirstDirectorySectorLocation, CompoundFile));
-            int i = 0;
-            SectorType nextSectorInChain =
-                CompoundFile.FatSectorChain.SectorsList[(int) DirectorySectors.Last().SectorNumber];
-            while (nextSectorInChain!=SectorType.EndOfChain)
+            SectorNumbers = new List<uint>();
+            SectorNumbers.Add((uint)CompoundFile.Header.FirstDirectorySectorLocation);
+            var nextSector = CompoundFile.FatSectorChain[(int)CompoundFile.Header.FirstDirectorySectorLocation];
+            while (nextSector != SectorType.EndOfChain)
             {
-                
-                DirectorySectors.Add(new DirectorySector((uint)nextSectorInChain, CompoundFile));
-                nextSectorInChain =
-                CompoundFile.FatSectorChain.SectorsList[(int)DirectorySectors.Last().SectorNumber];
-                i++;
+                SectorNumbers.Add((uint)nextSector);
+                nextSector = CompoundFile.FatSectorChain[(int)SectorNumbers.Last()];
             }
         }
+        
     }
 }

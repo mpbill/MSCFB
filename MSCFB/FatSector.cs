@@ -17,7 +17,11 @@ namespace MSCFB
             LoadSectors();
             
         }
-
+        public SectorType this[int index]
+        {
+            get { return SectorsList[index]; }
+            set { SectorsList[index] = value; }
+        }
         private void LoadSectors()
         {
             CompoundFile.MoveReaderToSector((uint)CompoundFile.Header.DifatArray[0]);
