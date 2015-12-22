@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Text;
 using MSCFB.Enum;
 
@@ -6,7 +7,7 @@ namespace MSCFB.Chains
 {
     public class DirectoryEntry : IComparable<DirectoryEntry>
     {
-        public uint EntryIndex { get; private set; }
+        public StreamID EntryID { get; private set; }
         public uint StartingSectorLocation { get; private set; }
         public ulong StreamSize { get; private set; }
         public byte[] ModifiedTime { get; private set; }
@@ -28,12 +29,12 @@ namespace MSCFB.Chains
         public string Name { get { return RawName.TrimEnd(new char[1] {'\0'}); } }
         public ushort NameLength { get; private set; }
         
-        public DirectoryEntry(CompoundFile compoundFile, uint entryIndex)
+        public DirectoryEntry(CompoundFile compoundFile, StreamID entryID)
         {
-            EntryIndex = entryIndex;
+            EntryID = entryID;
             CompoundFile = compoundFile;
             
-            CompoundFile.MoveReaderToDirectoryEntry(EntryIndex);
+            CompoundFile.Seek(CompoundFile.DirectoryChain[entryID], SeekOrigin.Begin);
             RawName = Encoding.Unicode.GetString(CompoundFile.FileReader.ReadBytes(64));
             NameLength = BitConverter.ToUInt16(CompoundFile.FileReader.ReadBytes(2), 0);
             ObjectType = (DirectoryEntryObjectType)CompoundFile.FileReader.ReadByte();
@@ -48,11 +49,11 @@ namespace MSCFB.Chains
             StartingSectorLocation = BitConverter.ToUInt32(CompoundFile.FileReader.ReadBytes(4), 0);
             StreamSize = BitConverter.ToUInt64(CompoundFile.FileReader.ReadBytes(8), 0);
             if(LeftSiblingID!=StreamID.NoStream)
-                LeftSiblingDirectoryEntry = new DirectoryEntry(CompoundFile, (uint)LeftSiblingID);
+                LeftSiblingDirectoryEntry = new DirectoryEntry(CompoundFile, LeftSiblingID);
             if(RightSiblingID!=StreamID.NoStream)
-                RightSiblingDirectoryEntry = new DirectoryEntry(CompoundFile, (uint)RightSiblingID);
+                RightSiblingDirectoryEntry = new DirectoryEntry(CompoundFile, RightSiblingID);
             if(ChildID!=StreamID.NoStream)
-                ChildDirectoryEntry = new DirectoryEntry(CompoundFile, (uint)ChildID);
+                ChildDirectoryEntry = new DirectoryEntry(CompoundFile, ChildID);
         }   
         #region compare
         public int CompareTo(DirectoryEntry other)

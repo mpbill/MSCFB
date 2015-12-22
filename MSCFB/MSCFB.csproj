@@ -41,9 +41,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Chains\ChainParent.cs" />
     <Compile Include="Chains\DifatChain.cs" />
     <Compile Include="Chains\DirectoryChain.cs" />
     <Compile Include="Chains\DirectoryEntry.cs" />
+    <Compile Include="Chains\DirectorySectorChain.cs" />
     <Compile Include="Chains\FatChain.cs" />
     <Compile Include="Chains\MiniFatChain.cs" />
     <Compile Include="Enum\ByteOrder.cs" />

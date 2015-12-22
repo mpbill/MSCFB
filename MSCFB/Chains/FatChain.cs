@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using MSCFB.Static;
 
@@ -9,7 +10,7 @@ namespace MSCFB.Chains
     public class FatChain : IEnumerable<SectorType>
     {
         public CompoundFile CompoundFile { get; private set; }
-        
+        public List<SectorType> List => this.ToList();
         public FatChain(CompoundFile compoundFile)
         {
             this.CompoundFile = compoundFile;
@@ -32,20 +33,10 @@ namespace MSCFB.Chains
         {
 
             uint count = 0;
-            CompoundFile.DifatChain.Where()
-            var d = CompoundFile.DifatChain.Select((type, i) =>
-            {
-                if (type <= SectorType.MaxRegSect)
-                    return true;
-                else
-                {
-                    return false;
-                }
-            }).Count()*CompoundFile.Header.SectorSize/4;
             foreach (SectorType sectorType in CompoundFile.DifatChain)
             {
                 if (sectorType <= SectorType.MaxRegSect)
-                    count += (CompoundFile.Header.SectorSize / 4);
+                    count += (uint)(CompoundFile.Header.Int32sInSector);
                 else
                 {
                     break;
@@ -55,24 +46,23 @@ namespace MSCFB.Chains
         }
         private void MoveToIndex(SectorType N)
         {
-            if(N==0)
-                CompoundFile.MoveReaderToSector(CompoundFile.DifatChain[0]);
-            var num = (CompoundFile.Header.SectorSize / 4) / (uint)N;
-            var remainder = (CompoundFile.Header.SectorSize / 4) % (uint)N;
-            if(remainder==0)
-                CompoundFile.MoveReaderToSector(CompoundFile.DifatChain[num]);
+            if (N == 0)
+                CompoundFile.MoveReaderToSector(CompoundFile.DifatChain[(SectorType)0]);
             else
             {
-                CompoundFile.MoveReaderToSector(CompoundFile.DifatChain[num+1]);
+                var num = (SectorType)((uint)N/(CompoundFile.Header.Int32sInSector));
+                var remainder = (uint)N%(CompoundFile.Header.Int32sInSector);
+                CompoundFile.MoveReaderToSector(CompoundFile.DifatChain[num]);
+                CompoundFile.Seek(remainder*4, SeekOrigin.Current);
+
             }
-            
         }
         public IEnumerator<SectorType> GetEnumerator()
         {
             var c = CalculateCount();
             for(uint i = 0;i<c; i++)
             {
-                yield return (SectorType)this[i];
+                yield return (SectorType)this[(SectorType)i];
             }
         }
 

@@ -14,20 +14,16 @@ namespace MSCFB.Chains
         }
         private uint CalculateCount()
         {
-            return (CompoundFile.Header.SectorSize * CompoundFile.Header.NumberOfMiniFatSectors) / CompoundFile.Header.MiniSectorShift;
+            return (uint)((CompoundFile.Header.SectorSize * CompoundFile.Header.NumberOfMiniFatSectors) / CompoundFile.Header.MiniSectorShift);
         }
         private void MoveToIndex(SectorType N)
         {
 
-            var num = (CompoundFile.Header.SectorSize / 4) / (uint)N;
+            var num = (SectorType)((CompoundFile.Header.Int32sInSector) / (uint)N);
             var remainder = (CompoundFile.Header.SectorSize / 4) % (uint)N;
-            if (remainder == 0)
-                CompoundFile.MoveReaderToSector(CompoundFile.DifatChain[num]);
-            else
-            {
-                CompoundFile.MoveReaderToSector(CompoundFile.DifatChain[num + 1]);
-            }
-
+            CompoundFile.MoveReaderToSector(remainder == 0
+                ? CompoundFile.DifatChain[num]
+                : CompoundFile.DifatChain[num + 1]);
         }
         public IEnumerator<SectorType> GetEnumerator()
         {

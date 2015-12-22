@@ -39,69 +39,69 @@ namespace MSCFB
             Header = new CompoundFileHeader(FileReader);
             DifatChain = new DifatChain(this);
             FatChain = new FatChain(this);
+            var t = FatChain.List;
             DirectoryChain = new DirectoryChain(this);
+            var d = DirectoryChain.List;
             //MiniFatChain = new MiniFatChain(this);
-            //RootDirectoryEntry = new DirectoryEntry(this, 0);
+            RootDirectoryEntry = new DirectoryEntry(this, 0);
             return;
         }
         public void Seek(long offset, SeekOrigin origin)
         {
             FileStream.Seek(offset, origin);
         } 
-        internal UInt32 SectorNumberToOffset(uint sectorNumber)
+        internal long SectorNumberToOffset(SectorType sectorNumber)
         {
-            return (sectorNumber + 1)*512;
+            return ((uint)sectorNumber + 1)*512;
         }
-        internal void MoveReaderToSector(uint sectorNumber)
+        internal void MoveReaderToSector(SectorType sectorNumber)
         {
-            MoveReaderToPosition(SectorNumberToOffset(sectorNumber));
-        }
-
-        internal void MoveReaderToPosition(uint position)
-        {
-            FileReader.BaseStream.Position = position;
+            Seek(SectorNumberToOffset(sectorNumber), SeekOrigin.Begin);
         }
 
-        internal byte[] ReadSector(uint sectorNumber)
+        
+
+        internal byte[] ReadSector(SectorType sectorNumber)
         {
-            MoveReaderToSector(sectorNumber);
-            return FileReader.ReadBytes((int) Resources.UIntPow(2, (uint) Header.SectorShift));
-        }
-        internal void MoveReaderToDirectoryEntry(uint index)
-        {
-            int Modulus;
             
-            switch (Header.MajorVersion)
-            {
-                case (MajorVersion.Version3):
-                {
-                        Modulus =(int)index % 4;
-                        MoveReaderToSector(DirectoryChain[index/4]);
-                        FileReader.BaseStream.Seek(Modulus * 128, SeekOrigin.Current);
-                        break;
-                }
-                default:
-                {
-                        Modulus = (int)index % 16;
-                        MoveReaderToSector(DirectoryChain[index / 16]);
-                        FileReader.BaseStream.Seek(Modulus * 128, SeekOrigin.Current);
-                        break;
-                }
-            }
-
+            MoveReaderToSector(sectorNumber);
+            return FileReader.ReadBytes(Header.SectorSize);
         }
+        //internal void MoveReaderToDirectoryEntry(uint index)
+        //{
+        //    int Modulus;
+            
+        //    switch (Header.MajorVersion)
+        //    {
+        //        case (MajorVersion.Version3):
+        //        {
+        //                Modulus =(int)index % 4;
+        //                MoveReaderToSector(DirectoryChain[index/4]);
+        //                FileReader.BaseStream.Seek(Modulus * 128, SeekOrigin.Current);
+        //                break;
+        //        }
+        //        default:
+        //        {
+        //                Modulus = (int)index % 16;
+        //                MoveReaderToSector(DirectoryChain[index / 16]);
+        //                FileReader.BaseStream.Seek(Modulus * 128, SeekOrigin.Current);
+        //                break;
+        //        }
+        //    }
+
+        //}
         internal uint ReadNthUintFromSector(uint n, SectorType sector)
         {
             if(n*4>=Header.SectorSize)
                 throw new IndexOutOfRangeException();
-            MoveReaderToSector((uint)sector);
+            MoveReaderToSector(sector);
             FileStream.Seek(4 * n, SeekOrigin.Current);
             return FileReader.ReadUInt32();
         }
-        internal byte[] ReadDirectoryEntry(uint index)
-        {
-            MoveReaderToDirectoryEntry(index);
-            return FileReader.ReadBytes(128);
-        }
+        //internal byte[] ReadDirectoryEntry(uint index)
+        //{
+        //    MoveReaderToDirectoryEntry(index);
+        //    return FileReader.ReadBytes(128);
+        //}
     }
 }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.IO;
 using MSCFB.Enum;
 using MSCFB.Exception;
+using MSCFB.Static;
 
 namespace MSCFB
 {
@@ -13,11 +14,11 @@ namespace MSCFB
     {
 
         /// <summary>
-        /// Number of Directory Sectors (4 bytes): This integer field contains the count of the number of directory sectors in the compound file.
+        /// Number of Directory Sectors (4 bytes): This integer field contains the Count of the number of directory sectors in the compound file.
         /// </summary>
         public UInt32 NumberOfDirectorySectors { get; private set; }
         /// <summary>
-        /// Number of FAT Sectors (4 bytes): This integer field contains the count of the number of FAT sectors in the compound file.
+        /// Number of FAT Sectors (4 bytes): This integer field contains the Count of the number of FAT sectors in the compound file.
         /// </summary>
         public UInt32 NumberOfFatSectors { get; private set; }
         /// <summary>
@@ -44,7 +45,7 @@ namespace MSCFB
         /// </summary>
         public SectorType FirstMiniFatSectorLocation { get; private set; }
         /// <summary>
-        /// Number of Mini FAT Sectors (4 bytes): This integer field contains the count of the number of mini FAT sectors in the compound file.
+        /// Number of Mini FAT Sectors (4 bytes): This integer field contains the Count of the number of mini FAT sectors in the compound file.
         /// </summary>
         public UInt32 NumberOfMiniFatSectors { get; private set; }
         /// <summary>
@@ -52,7 +53,7 @@ namespace MSCFB
         /// </summary>
         public SectorType FirstDifatSectorLocation { get; private set; }
         /// <summary>
-        /// Number of DIFAT Sectors (4 bytes): This integer field contains the count of the number of DIFAT sectors in the compound file.
+        /// Number of DIFAT Sectors (4 bytes): This integer field contains the Count of the number of DIFAT sectors in the compound file.
         /// </summary>
         public UInt32 NumberOfDifatSectors { get; private set; }
         /// <summary>
@@ -83,8 +84,9 @@ namespace MSCFB
             get { return _byteOrder; }
         }
 
-        public uint SectorSize { get; private set; }
-
+        public int SectorSize => ((UInt16)(2)).Power((ushort)SectorShift);
+        public int Int32sInSector => SectorSize / 4;
+        public int DirectoryEntriesInSector => SectorSize / 128;
         /// <summary>
         /// Major Version (2 bytes): Version number for breaking changes. This field MUST be set to either 0x0003 (version 3) or 0x0004 (version 4).
         /// </summary>
@@ -148,14 +150,12 @@ namespace MSCFB
                     {
                         if (MajorVersion != MajorVersion.Version3)
                             throw new InvalidMcdfHeaderException("Sector shift section was 0x0009 but Major Version was not 0x003");
-                        SectorSize = 512;
                         break;
                     }
                 case SectorShift.Shift4096:
                     {
                         if (MajorVersion != MajorVersion.Version4)
                             throw new InvalidMcdfHeaderException("Sector shift section was 0x000C but Major Version was not 0x004");
-                        SectorSize = 4096;
                         break;
                     }
                 default:

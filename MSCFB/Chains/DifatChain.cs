@@ -10,6 +10,7 @@ namespace MSCFB.Chains
     
     public class DifatChain : IEnumerable<SectorType>
     {
+        public List<SectorType> List => this.ToList(); 
         public CompoundFile CompoundFile { get; private set; }
         /// <summary>
         ///109 entries in header minus the last entry which points to next difat sector,
@@ -23,8 +24,16 @@ namespace MSCFB.Chains
         {
             get
             {
-                MoveToIndex(index);
-                return CompoundFile.FileReader.ReadSectorType();
+                try
+                {
+                    MoveToIndex(index);
+                    return CompoundFile.FileReader.ReadSectorType();
+                }
+                catch (IndexOutOfRangeException)
+                {
+                    throw;
+                }
+                
             }
             set
             {
@@ -54,19 +63,20 @@ namespace MSCFB.Chains
                 {
                     if(N<LastIndexInThisSector)
                     {
-                        CompoundFile.MoveReaderToSector((uint)nextSector);
+                        CompoundFile.MoveReaderToSector(nextSector);
                         CompoundFile.Seek((long)N*4, SeekOrigin.Current);
-                        break;
+                        return;
                     }
                     else
                     {
-                        CompoundFile.MoveReaderToSector((uint)nextSector);
+                        CompoundFile.MoveReaderToSector(nextSector);
                         CompoundFile.Seek(CompoundFile.Header.SectorSize-4, SeekOrigin.Current);
                         nextSector = CompoundFile.FileReader.ReadSectorType();
                         LastIndexInThisSector += 126;
                         continue;
                     }
                 }
+                throw new IndexOutOfRangeException();
             }
             
         }
