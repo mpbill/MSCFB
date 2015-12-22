@@ -14,7 +14,7 @@ namespace MSCFB
         private Stream FileStream { get; set; }
         public BinaryReader FileReader { get; private set; }
         public BinaryWriter FileWriter { get; private set; }
-        public FatSectorChain FatSectorChain { get; private set; }
+        public FatChain FatChain { get; private set; }
         public DifatChain DifatChain { get; private set; }
         public DirectoryChain DirectoryChain { get; private set; }
         public DirectoryEntry RootDirectoryEntry { get; private set; }
@@ -38,13 +38,16 @@ namespace MSCFB
         {
             Header = new CompoundFileHeader(FileReader);
             DifatChain = new DifatChain(this);
-            FatSectorChain = new FatSectorChain(this);
+            FatChain = new FatChain(this);
             DirectoryChain = new DirectoryChain(this);
-            MiniFatChain = new MiniFatChain(this);
-            RootDirectoryEntry = new DirectoryEntry(this, 0);
+            //MiniFatChain = new MiniFatChain(this);
+            //RootDirectoryEntry = new DirectoryEntry(this, 0);
             return;
         }
-
+        public void Seek(long offset, SeekOrigin origin)
+        {
+            FileStream.Seek(offset, origin);
+        } 
         internal UInt32 SectorNumberToOffset(uint sectorNumber)
         {
             return (sectorNumber + 1)*512;
@@ -73,19 +76,27 @@ namespace MSCFB
                 case (MajorVersion.Version3):
                 {
                         Modulus =(int)index % 4;
-                        MoveReaderToSector(DirectoryChain[(int)index/4]);
+                        MoveReaderToSector(DirectoryChain[index/4]);
                         FileReader.BaseStream.Seek(Modulus * 128, SeekOrigin.Current);
                         break;
                 }
                 default:
                 {
                         Modulus = (int)index % 16;
-                        MoveReaderToSector(DirectoryChain[(int)index / 16]);
+                        MoveReaderToSector(DirectoryChain[index / 16]);
                         FileReader.BaseStream.Seek(Modulus * 128, SeekOrigin.Current);
                         break;
                 }
             }
 
+        }
+        internal uint ReadNthUintFromSector(uint n, SectorType sector)
+        {
+            if(n*4>=Header.SectorSize)
+                throw new IndexOutOfRangeException();
+            MoveReaderToSector((uint)sector);
+            FileStream.Seek(4 * n, SeekOrigin.Current);
+            return FileReader.ReadUInt32();
         }
         internal byte[] ReadDirectoryEntry(uint index)
         {

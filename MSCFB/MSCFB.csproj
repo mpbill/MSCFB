@@ -44,7 +44,7 @@
     <Compile Include="Chains\DifatChain.cs" />
     <Compile Include="Chains\DirectoryChain.cs" />
     <Compile Include="Chains\DirectoryEntry.cs" />
-    <Compile Include="Chains\FatSector.cs" />
+    <Compile Include="Chains\FatChain.cs" />
     <Compile Include="Chains\MiniFatChain.cs" />
     <Compile Include="Enum\ByteOrder.cs" />
     <Compile Include="Enum\ColorFlag.cs" />

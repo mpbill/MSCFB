@@ -19,5 +19,13 @@ namespace MSCFB.Static
 
             binaryWriter.BaseStream.Seek(offset, origin);
         }
+        public static SectorType ReadSectorType(this BinaryReader binaryReader)
+        {
+            return (SectorType)binaryReader.ReadUInt32();
+        }
+        public static void Write(this BinaryWriter binaryWriter, SectorType sectorType)
+        {
+            binaryWriter.Write((uint)sectorType);
+        }
     }
 }

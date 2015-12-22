@@ -1,28 +1,42 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 
 namespace MSCFB.Chains
 {
-    public class MiniFatChain
+    public class MiniFatChain : IEnumerable<SectorType>
     {
         private CompoundFile CompoundFile { get; set; }
-        private List<uint> SectorNumbers { get; set; }
+
         public MiniFatChain(CompoundFile compoundFile)
         {
             CompoundFile = compoundFile;
-            SectorNumbers = new List<uint>();
-            SectorType NextSector = SectorType.EndOfChain;
-            if (CompoundFile.Header.FirstMiniFatSectorLocation <= SectorType.MaxRegSect)
-            {
-                SectorNumbers.Capacity += (int)(CompoundFile.Header.SectorSize/4);
-                CompoundFile.MoveReaderToSector((uint)CompoundFile.Header.FirstMiniFatSectorLocation);
-                for(int i = 0; i < CompoundFile.Header.SectorSize / 4; i++)
-                {
-                    SectorNumbers.Add(CompoundFile.FileReader.ReadUInt32());
-                }
-                //SectorType = CompoundFile.FatSectorChain[]
-            }
-            //CompoundFile.
 
+        }
+        private uint CalculateCount()
+        {
+            return (CompoundFile.Header.SectorSize * CompoundFile.Header.NumberOfMiniFatSectors) / CompoundFile.Header.MiniSectorShift;
+        }
+        private void MoveToIndex(SectorType N)
+        {
+
+            var num = (CompoundFile.Header.SectorSize / 4) / (uint)N;
+            var remainder = (CompoundFile.Header.SectorSize / 4) % (uint)N;
+            if (remainder == 0)
+                CompoundFile.MoveReaderToSector(CompoundFile.DifatChain[num]);
+            else
+            {
+                CompoundFile.MoveReaderToSector(CompoundFile.DifatChain[num + 1]);
+            }
+
+        }
+        public IEnumerator<SectorType> GetEnumerator()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }
