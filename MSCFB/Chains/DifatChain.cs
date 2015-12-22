@@ -11,15 +11,13 @@ namespace MSCFB.Chains
     public class DifatChain : IEnumerable<SectorType>
     {
         public CompoundFile CompoundFile { get; private set; }
-        private long position = -1;
-
-        public long Count
-        {
-            get
-            {
-                return CalculateCount();
-            }
-        }
+        /// <summary>
+        ///109 entries in header minus the last entry which points to next difat sector,
+        ///plus number of difat sectors times the sector size in bytes divided by 4, the number of bytes in an unsigned int.
+        ///minus one for each difat sector which marks the next difat sector.
+        /// </summary>
+        public long Count => 108 + (CompoundFile.Header.NumberOfDifatSectors) * CompoundFile.Header.SectorSize / 4 -
+                             CompoundFile.Header.NumberOfDifatSectors;
 
         public SectorType this[SectorType index]
         {
@@ -34,52 +32,9 @@ namespace MSCFB.Chains
                 CompoundFile.FileWriter.Write(value);
             }
         }
-        public uint this[uint index]
-        {
-            get
-            {
-                MoveToIndex((SectorType)index);
-                return CompoundFile.FileReader.ReadUInt32();
-            }
-            set
-            {
-                MoveToIndex((SectorType)index);
-                CompoundFile.FileWriter.Write(value);
-            }
-        }
         public DifatChain(CompoundFile compoundFile)
         {
             CompoundFile = compoundFile;
-            AddNextSector();
-
-
-        }
-        private void AddNextSector()
-        {
-
-        }
-        private long CalculateCount()
-        {
-            CompoundFile.Seek(508, SeekOrigin.Begin);
-            SectorType nextSector = CompoundFile.FileReader.ReadSectorType();
-            long count = 108;
-            if (nextSector > SectorType.MaxRegSect)
-            {
-                return count;
-            }
-            else
-            {
-                while (nextSector <= SectorType.MaxRegSect)
-                {
-                    
-                    CompoundFile.MoveReaderToSector((uint)nextSector);
-                    CompoundFile.Seek(CompoundFile.Header.SectorSize - 4, SeekOrigin.Current);
-                    nextSector = CompoundFile.FileReader.ReadSectorType();
-                    count += ((long)((CompoundFile.Header.SectorSize) - 1) / 4);
-                    continue;
-                }
-            }
-            return count;
         }
         public void MoveToIndex(SectorType N)
         {
@@ -115,38 +70,12 @@ namespace MSCFB.Chains
             }
             
         }
-
-        public void Dispose()
-        {
-            return;
-        }
-
-        public bool MoveNext()
-        {
-            position++;
-            return position < Count;
-        }
-
-        public void Reset()
-        {
-            position = -1;
-        }
-
-        public SectorType Current
-        {
-            get
-            {
-                if(position==-1)
-                    throw new InvalidOperationException();
-                return this[(SectorType)position];
-            }
-        }
         public IEnumerator<SectorType> GetEnumerator()
         {
-            var c = Count;
-            for(uint i = 0; i < c; i++)
+            var c = (SectorType)Count;
+            for(SectorType i = 0; i < c; i++)
             {
-                yield return (SectorType)this[i];
+                yield return this[i];
             }
         }
 

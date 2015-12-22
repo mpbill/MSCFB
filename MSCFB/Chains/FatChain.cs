@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using MSCFB.Static;
 
 namespace MSCFB.Chains
@@ -13,19 +14,6 @@ namespace MSCFB.Chains
         {
             this.CompoundFile = compoundFile;
             
-        }
-        public uint this[uint index]
-        {
-            get
-            {
-                MoveToIndex((SectorType)index);
-                return CompoundFile.FileReader.ReadUInt32();
-            }
-            set
-            {
-                MoveToIndex((SectorType)index);
-                CompoundFile.FileWriter.Write(value);
-            }
         }
         public SectorType this[SectorType index]
         {
@@ -42,7 +30,18 @@ namespace MSCFB.Chains
         }
         private uint CalculateCount()
         {
+
             uint count = 0;
+            CompoundFile.DifatChain.Where()
+            var d = CompoundFile.DifatChain.Select((type, i) =>
+            {
+                if (type <= SectorType.MaxRegSect)
+                    return true;
+                else
+                {
+                    return false;
+                }
+            }).Count()*CompoundFile.Header.SectorSize/4;
             foreach (SectorType sectorType in CompoundFile.DifatChain)
             {
                 if (sectorType <= SectorType.MaxRegSect)
