@@ -35,12 +35,12 @@ namespace MSCFB.Chains
         }
         private long IndexToOffset(StreamID N)
         {
-            CompoundFile.di
+            
             if(N==0)
                 return CompoundFile.SectorNumberToOffset(CompoundFile.FatChain[CompoundFile.Header.FirstDirectorySectorLocation]);
             else
             {
-                CompoundFile.SectorNumberToOffset(this[N-1])
+                //CompoundFile.SectorNumberToOffset(this[N - 1]);
                 var num = (SectorType)((uint)N/(CompoundFile.Header.DirectoryEntriesInSector));
                 var remainder = (uint)N%(CompoundFile.Header.DirectoryEntriesInSector);
                 if (remainder == 0)

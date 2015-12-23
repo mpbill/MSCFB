@@ -10,6 +10,7 @@ namespace MSCFB
 {
     public class CompoundFile
     {
+        
         public CompoundFileHeader Header { get; private set; }
         private Stream FileStream { get; set; }
         public BinaryReader FileReader { get; private set; }
@@ -33,16 +34,13 @@ namespace MSCFB
             CanWrite = false;
             Load();
         }
-
+        
         private void Load()
         {
             Header = new CompoundFileHeader(FileReader);
             DifatChain = new DifatChain(this);
             FatChain = new FatChain(this);
-            var t = FatChain.List;
-            DirectoryChain = new DirectoryChain(this);
-            var d = DirectoryChain.List;
-            //MiniFatChain = new MiniFatChain(this);
+            MiniFatChain = new MiniFatChain(this);
             RootDirectoryEntry = new DirectoryEntry(this, 0);
             return;
         }

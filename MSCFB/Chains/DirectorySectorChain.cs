@@ -53,6 +53,11 @@ namespace MSCFB.Chains
 
             }
         }
+
+        public DirectorySectorChain(CompoundFile compoundFile)
+        {
+            CompoundFile = compoundFile;
+        }
         public SectorType IndexToFatIndex(long index)
         {
             long i = 0;

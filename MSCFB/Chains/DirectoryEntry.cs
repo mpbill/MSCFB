@@ -7,7 +7,9 @@ namespace MSCFB.Chains
 {
     public class DirectoryEntry : IComparable<DirectoryEntry>
     {
-        public StreamID EntryID { get; private set; }
+        
+        public StreamID StreamId { get; private set; }
+        public long StreamIdLong => (long) StreamId;
         public uint StartingSectorLocation { get; private set; }
         public ulong StreamSize { get; private set; }
         public byte[] ModifiedTime { get; private set; }
@@ -28,18 +30,31 @@ namespace MSCFB.Chains
         public string RawName { get; private set; }
         public string Name { get { return RawName.TrimEnd(new char[1] {'\0'}); } }
         public ushort NameLength { get; private set; }
-        
-        public DirectoryEntry(CompoundFile compoundFile, StreamID entryID)
+        public DirectoryEntry ParentDirectoryEntry { get; private set; }
+        public DirectoryEntry(CompoundFile compoundFile, StreamID streamId)
         {
-            EntryID = entryID;
+            StreamId = streamId;
             CompoundFile = compoundFile;
+            LoadDirectoryEntry();
             
-            CompoundFile.Seek(CompoundFile.DirectoryChain[entryID], SeekOrigin.Begin);
+        }
+        
+        public DirectoryEntry(DirectoryEntry Parent, StreamID streamId)
+        {
+            ParentDirectoryEntry = Parent;
+            this.CompoundFile = Parent.CompoundFile;
+            this.StreamId = streamId;
+            LoadDirectoryEntry();
+        }
+
+        private void LoadDirectoryEntry()
+        {
+            MoveReaderToOffset();
             RawName = Encoding.Unicode.GetString(CompoundFile.FileReader.ReadBytes(64));
             NameLength = BitConverter.ToUInt16(CompoundFile.FileReader.ReadBytes(2), 0);
             ObjectType = (DirectoryEntryObjectType)CompoundFile.FileReader.ReadByte();
             ColorFlag = (ColorFlag)CompoundFile.FileReader.ReadByte();
-            LeftSiblingID =(StreamID)BitConverter.ToUInt32(CompoundFile.FileReader.ReadBytes(4), 0);
+            LeftSiblingID = (StreamID)BitConverter.ToUInt32(CompoundFile.FileReader.ReadBytes(4), 0);
             RightSiblingID = (StreamID)BitConverter.ToUInt32(CompoundFile.FileReader.ReadBytes(4), 0);
             ChildID = (StreamID)BitConverter.ToUInt32(CompoundFile.FileReader.ReadBytes(4), 0);
             CLSID = CompoundFile.FileReader.ReadBytes(16);
@@ -48,13 +63,14 @@ namespace MSCFB.Chains
             ModifiedTime = CompoundFile.FileReader.ReadBytes(8);
             StartingSectorLocation = BitConverter.ToUInt32(CompoundFile.FileReader.ReadBytes(4), 0);
             StreamSize = BitConverter.ToUInt64(CompoundFile.FileReader.ReadBytes(8), 0);
-            if(LeftSiblingID!=StreamID.NoStream)
-                LeftSiblingDirectoryEntry = new DirectoryEntry(CompoundFile, LeftSiblingID);
-            if(RightSiblingID!=StreamID.NoStream)
-                RightSiblingDirectoryEntry = new DirectoryEntry(CompoundFile, RightSiblingID);
-            if(ChildID!=StreamID.NoStream)
-                ChildDirectoryEntry = new DirectoryEntry(CompoundFile, ChildID);
-        }   
+            if (LeftSiblingID != StreamID.NoStream)
+                LeftSiblingDirectoryEntry = new DirectoryEntry(this, LeftSiblingID);
+            if (RightSiblingID != StreamID.NoStream)
+                RightSiblingDirectoryEntry = new DirectoryEntry(this, RightSiblingID);
+            if (ChildID != StreamID.NoStream)
+                ChildDirectoryEntry = new DirectoryEntry(this, ChildID);
+            
+        }
         #region compare
         public int CompareTo(DirectoryEntry other)
         {
@@ -81,17 +97,54 @@ namespace MSCFB.Chains
                 return 0;
             }
         }
+
+        private void MoveReaderToOffset()
+        {
+            var NextSector = CompoundFile.Header.FirstDirectorySectorLocation;
+            if (this.StreamIdLong==0)
+            {
+                CompoundFile.MoveReaderToSector(NextSector);
+                
+            }
+            else
+            {
+                var divided = StreamIdLong/CompoundFile.Header.DirectoryEntriesInSector;
+                var remainder = StreamIdLong%CompoundFile.Header.DirectoryEntriesInSector;
+                long i = 0;
+                while (NextSector<=SectorType.MaxRegSect)
+                {
+                    
+                    if (i == divided && NextSector<=SectorType.MaxRegSect)
+                    {
+                        CompoundFile.MoveReaderToSector(NextSector);
+                        CompoundFile.Seek(remainder*128, SeekOrigin.Current);
+                        return;
+                    }
+                    else
+                    {
+                        i++;
+                        NextSector = CompoundFile.FatChain[NextSector];
+                    }
+                    
+
+
+                }
+                throw new IndexOutOfRangeException("Invalid Stream ID");
+            }
+
+
+        }
         public static bool operator < (DirectoryEntry operand1, DirectoryEntry operand2)
         {
-            return operand1.CompareTo(operand2) < 0;
+            return operand1 != null && operand1.CompareTo(operand2) < 0;
         }
         public static bool operator >(DirectoryEntry operand1, DirectoryEntry operand2)
         {
-            return operand1.CompareTo(operand2) > 0;
+            return operand1 != null && operand1.CompareTo(operand2) > 0;
         }
         public static bool operator ==(DirectoryEntry operand1, DirectoryEntry operand2)
         {
-            return operand1.CompareTo(operand2) == 0;
+            return operand1 != null && operand1.CompareTo(operand2) == 0;
         }
         public static bool operator !=(DirectoryEntry operand1, DirectoryEntry operand2)
         {
