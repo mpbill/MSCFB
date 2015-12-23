@@ -3,11 +3,10 @@ using System.IO;
 using System.Text;
 using MSCFB.Enum;
 
-namespace MSCFB.Chains
+namespace MSCFB.Directory
 {
-    public class DirectoryEntry : IComparable<DirectoryEntry>
+    public class DirectoryEntryParent : IDirectoryEntry
     {
-        
         public StreamID StreamId { get; private set; }
         public long StreamIdLong => (long) StreamId;
         public uint StartingSectorLocation { get; private set; }
@@ -19,27 +18,52 @@ namespace MSCFB.Chains
         public StreamID ChildID { get; private set; }
         public StreamID LeftSiblingID { get; private set; }
         public StreamID RightSiblingID { get; private set; }
-        public DirectoryEntry LeftSiblingDirectoryEntry { get; set; }
-        public DirectoryEntry RightSiblingDirectoryEntry { get; set; }
+        public IDirectoryEntry LeftSiblingDirectoryEntry { get; set; }
+        public IDirectoryEntry RightSiblingDirectoryEntry { get; set; }
         public CompoundFile CompoundFile { get; private set; }
-        
-        public DirectoryEntry ChildDirectoryEntry { get; set; }
+        public IDirectoryEntry ChildDirectoryEntry { get; set; }
         public ColorFlag ColorFlag { get; private set; }
         public DirectoryEntryObjectType ObjectType { get; private set; }
-        
-        public string RawName { get; private set; }
-        public string Name { get { return RawName.TrimEnd(new char[1] {'\0'}); } }
+        private string name;
+        public string Name
+        {
+            get
+            {
+                return name;
+            }
+            set
+            {
+                if (value.Length > 31)
+                {
+                    throw new InvalidOperationException("Name cannot be more than 31 characters.");
+                }
+                foreach (string illegal in Resources.Illegal)
+                {
+                    if(value.Contains(illegal))
+                        throw new InvalidOperationException($"String Cannot contain '{illegal}'");
+                }
+                name = value;
+                
+            }
+        }
         public ushort NameLength { get; private set; }
-        public DirectoryEntry ParentDirectoryEntry { get; private set; }
-        public DirectoryEntry(CompoundFile compoundFile, StreamID streamId)
+        public IDirectoryEntry ParentDirectoryEntry { get; set; }
+
+       
+
+        public DirectoryEntryParent(CompoundFile compoundFile, StreamID streamId)
         {
             StreamId = streamId;
+            
             CompoundFile = compoundFile;
             LoadDirectoryEntry();
             
         }
-        
-        public DirectoryEntry(DirectoryEntry Parent, StreamID streamId)
+        public DirectoryEntryParent(DirectoryEntryObjectType type, string name, IDirectoryEntry Parent)
+        {
+            this.Name = name;
+        }
+        public DirectoryEntryParent(IDirectoryEntry Parent, StreamID streamId)
         {
             ParentDirectoryEntry = Parent;
             this.CompoundFile = Parent.CompoundFile;
@@ -50,8 +74,9 @@ namespace MSCFB.Chains
         private void LoadDirectoryEntry()
         {
             MoveReaderToOffset();
-            RawName = Encoding.Unicode.GetString(CompoundFile.FileReader.ReadBytes(64));
+            var nbytes = CompoundFile.FileReader.ReadBytes(64);
             NameLength = BitConverter.ToUInt16(CompoundFile.FileReader.ReadBytes(2), 0);
+            Name = Encoding.Unicode.GetString(nbytes, 0, NameLength - 2);
             ObjectType = (DirectoryEntryObjectType)CompoundFile.FileReader.ReadByte();
             ColorFlag = (ColorFlag)CompoundFile.FileReader.ReadByte();
             LeftSiblingID = (StreamID)BitConverter.ToUInt32(CompoundFile.FileReader.ReadBytes(4), 0);
@@ -64,15 +89,19 @@ namespace MSCFB.Chains
             StartingSectorLocation = BitConverter.ToUInt32(CompoundFile.FileReader.ReadBytes(4), 0);
             StreamSize = BitConverter.ToUInt64(CompoundFile.FileReader.ReadBytes(8), 0);
             if (LeftSiblingID != StreamID.NoStream)
-                LeftSiblingDirectoryEntry = new DirectoryEntry(this, LeftSiblingID);
+                LeftSiblingDirectoryEntry = DirectoryEntryFactory.ChildFromStream(this, LeftSiblingID);
             if (RightSiblingID != StreamID.NoStream)
-                RightSiblingDirectoryEntry = new DirectoryEntry(this, RightSiblingID);
+                RightSiblingDirectoryEntry = DirectoryEntryFactory.ChildFromStream(this, RightSiblingID);
             if (ChildID != StreamID.NoStream)
-                ChildDirectoryEntry = new DirectoryEntry(this, ChildID);
+                ChildDirectoryEntry = DirectoryEntryFactory.ChildFromStream(this, ChildID);
             
         }
+        
+        
+        
+
         #region compare
-        public int CompareTo(DirectoryEntry other)
+        public int CompareTo(IDirectoryEntry other)
         {
            
             if (this.NameLength < other.NameLength)
@@ -84,8 +113,8 @@ namespace MSCFB.Chains
                 Char a, b;
                 for (int i = 0; i < this.NameLength; i++)
                 {
-                    a = Char.ToUpper(this.RawName[i]);
-                    b = Char.ToUpper(other.RawName[i]);
+                    a = Char.ToUpper(this.Name[i]);
+                    b = Char.ToUpper(other.Name[i]);
                     if(a==b)
                         continue;
                     else
@@ -97,7 +126,7 @@ namespace MSCFB.Chains
                 return 0;
             }
         }
-
+        //public void AddLeaf(DirectoryEntryParent Entry) { }
         private void MoveReaderToOffset()
         {
             var NextSector = CompoundFile.Header.FirstDirectorySectorLocation;
@@ -134,32 +163,39 @@ namespace MSCFB.Chains
 
 
         }
-        public static bool operator < (DirectoryEntry operand1, DirectoryEntry operand2)
+
+
+        public static bool operator < (DirectoryEntryParent operand1, DirectoryEntryParent operand2)
         {
             return operand1 != null && operand1.CompareTo(operand2) < 0;
         }
-        public static bool operator >(DirectoryEntry operand1, DirectoryEntry operand2)
+        public static bool operator >(DirectoryEntryParent operand1, DirectoryEntryParent operand2)
         {
             return operand1 != null && operand1.CompareTo(operand2) > 0;
         }
-        public static bool operator ==(DirectoryEntry operand1, DirectoryEntry operand2)
+        public static bool operator ==(DirectoryEntryParent operand1, DirectoryEntryParent operand2)
         {
-            return operand1 != null && operand1.CompareTo(operand2) == 0;
+            if (ReferenceEquals(null, operand1))
+                return ReferenceEquals(null, operand2);
+            if (ReferenceEquals(operand2, null))
+                return false;
+            return operand1.CompareTo(operand2) == 0;
         }
-        public static bool operator !=(DirectoryEntry operand1, DirectoryEntry operand2)
+        public static bool operator !=(DirectoryEntryParent operand1, DirectoryEntryParent operand2)
         {
             return !(operand1 == operand2);
         }
-        public static bool operator <=(DirectoryEntry operand1, DirectoryEntry operand2)
+        public static bool operator <=(DirectoryEntryParent operand1, DirectoryEntryParent operand2)
         {
             return ((operand1 < operand2) || (operand1 == operand2));
         }
-        public static bool operator >=(DirectoryEntry operand1, DirectoryEntry operand2)
+        public static bool operator >=(DirectoryEntryParent operand1, DirectoryEntryParent operand2)
         {
             return ((operand1 >= operand2) || (operand1 == operand2));
         }
         #endregion
         //public void Insert
+
         public override string ToString()
         {
             return $"[{this.ObjectType}][{this.Name}]";

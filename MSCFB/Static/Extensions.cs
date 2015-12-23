@@ -37,6 +37,14 @@ namespace MSCFB.Static
         {
             binaryWriter.Write((uint)streamID);
         }
+        public static DirectoryEntryObjectType ReadDirectoryEntryObjectType(this BinaryReader binaryReader)
+        {
+            return (DirectoryEntryObjectType)binaryReader.ReadByte();
+        }
+        public static void Write(this BinaryWriter binaryWriter, DirectoryEntryObjectType objectType)
+        {
+            binaryWriter.Write((byte)objectType);
+        }
         public static UInt32 Power(this UInt32 a, UInt32 b)
         {
             UInt32 result = 1;

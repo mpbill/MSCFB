@@ -21,6 +21,11 @@ namespace MSCFB
             get { return ReservedBytes1; }
         }
 
+        public static string[] Illegal
+        {
+            get { return Illegal1; }
+        }
+
         private static readonly byte[] _remainingbytes0 = Enumerable.Repeat((byte)0x00, 3584).ToArray();
         public static byte[] RemainingBytes0 { get { return _remainingbytes0; } }
         private static readonly byte[] _headerSectionReserved = Enumerable.Repeat((byte)0x00, 6).ToArray();
@@ -33,6 +38,7 @@ namespace MSCFB
         private static readonly byte[] _mcdfHeaderClsid = Enumerable.Repeat((byte)0x00, 16).ToArray();
         private static readonly ushort _correctMinorVersion = 0x003E;
         private static readonly byte[] ReservedBytes1 = Enumerable.Repeat((byte)0x00, 6).ToArray();
+        private static readonly string[] Illegal1 = new string[4] {"/", "\\", ":", "!"};
 
         public static byte[] McdfHeaderSigniture
         {

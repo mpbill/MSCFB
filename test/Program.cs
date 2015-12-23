@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Reflection;
+using System.Threading;
 using MSCFB;
 using MSCFB.Chains;
 
@@ -17,6 +18,16 @@ namespace test
     {
         static void Main(string[] args)
         {
+            Thread t = new Thread(new ThreadStart(method), 100000000);
+            t.Start();
+            t.Join();
+            
+
+            
+
+        }
+        static void method()
+        {
             using (var fs = File.OpenRead("empty.msg"))
             {
                 CompoundFile f = new CompoundFile(fs);
@@ -26,10 +37,6 @@ namespace test
 
 
             }
-            
-
-            return;
-
         }
     }
    

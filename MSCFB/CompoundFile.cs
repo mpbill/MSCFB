@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using MSCFB.Chains;
+using MSCFB.Directory;
 using MSCFB.Enum;
 namespace MSCFB
 {
@@ -18,7 +19,7 @@ namespace MSCFB
         public FatChain FatChain { get; private set; }
         public DifatChain DifatChain { get; private set; }
         public DirectoryChain DirectoryChain { get; private set; }
-        public DirectoryEntry RootDirectoryEntry { get; private set; }
+        public RootDirectoryEntry RootDirectoryEntry { get; private set; }
         public bool CanWrite { get; private set; }
         public MiniFatChain MiniFatChain { get; private set; }
         public CompoundFile(Stream fileStream)
@@ -40,8 +41,8 @@ namespace MSCFB
             Header = new CompoundFileHeader(FileReader);
             DifatChain = new DifatChain(this);
             FatChain = new FatChain(this);
-            MiniFatChain = new MiniFatChain(this);
-            RootDirectoryEntry = new DirectoryEntry(this, 0);
+            RootDirectoryEntry = new RootDirectoryEntry(this);
+
             return;
         }
         public void Seek(long offset, SeekOrigin origin)
@@ -56,6 +57,7 @@ namespace MSCFB
         {
             Seek(SectorNumberToOffset(sectorNumber), SeekOrigin.Begin);
         }
+        
 
         
 
