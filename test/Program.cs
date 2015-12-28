@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Generic.RedBlack;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -9,7 +10,8 @@ using System.Reflection;
 using System.Threading;
 using MSCFB;
 using MSCFB.Chains;
-
+using MSCFB.Directory;
+using RedBlackCS;
 
 namespace test
 {
@@ -18,13 +20,12 @@ namespace test
     {
         static void Main(string[] args)
         {
+            MSCFB.Directory.DirectoryEntry e = new MSCFB.Directory.DirectoryEntry() { Name = "Michael" };
+            MSCFB.Directory.DirectoryEntry f = new MSCFB.Directory.DirectoryEntry() { Name = "Michael" };
+            var a = e == f;
             Thread t = new Thread(new ThreadStart(method), 100000000);
             t.Start();
             t.Join();
-            
-
-            
-
         }
         static void method()
         {

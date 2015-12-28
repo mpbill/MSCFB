@@ -47,9 +47,14 @@
     <Compile Include="Chains\DirectorySectorChain.cs" />
     <Compile Include="Chains\FatChain.cs" />
     <Compile Include="Chains\MiniFatChain.cs" />
+    <Compile Include="Directory\DirectoryEntry.cs" />
     <Compile Include="Directory\DirectoryEntryFactory.cs" />
+    <Compile Include="Directory\DirectoryEntryName.cs" />
     <Compile Include="Directory\DirectoryEntryParent.cs" />
+    <Compile Include="Directory\DirectoryTree.cs" />
     <Compile Include="Directory\IDirectoryEntry.cs" />
+    <Compile Include="Directory\IStorageEntry.cs" />
+    <Compile Include="Directory\RedBlackDirectoryTree.cs" />
     <Compile Include="Directory\RootDirectoryEntry.cs" />
     <Compile Include="Directory\StorageEntry.cs" />
     <Compile Include="Directory\StreamEntry.cs" />
@@ -63,6 +68,7 @@
     <Compile Include="Enum\StreamID.cs" />
     <Compile Include="Exception\InvalidMcdfHeaderException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="rbt.cs" />
     <Compile Include="Static\Extensions.cs" />
     <Compile Include="Static\Resources.cs" />
     <Compile Include="Enum\SectorType.cs" />

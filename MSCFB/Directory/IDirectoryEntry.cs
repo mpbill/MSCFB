@@ -4,28 +4,27 @@ using MSCFB.Enum;
 
 namespace MSCFB.Directory
 {
-    public interface IDirectoryEntry : IComparable<IDirectoryEntry>
+    public interface IDirectoryEntry : IComparable<IDirectoryEntry>, IComparable<String>
     {
-        StreamID StreamId { get; }
+        StreamID StreamId { get; set; }
         long StreamIdLong { get; }
-        ushort NameLength { get; }
-        uint StartingSectorLocation { get;  }
-        ulong StreamSize { get;  }
-        byte[] ModifiedTime { get;  }
-        byte[] CreationTime { get;  }
-        byte[] StateBits { get;  }
-        byte[] CLSID { get;  }
-        StreamID ChildID { get;  }
-        StreamID LeftSiblingID { get; }
-        StreamID RightSiblingID { get; }
-        IDirectoryEntry LeftSiblingDirectoryEntry { get; set; }
-        IDirectoryEntry RightSiblingDirectoryEntry { get; set; }
-        IDirectoryEntry ParentDirectoryEntry { get; set; }
-        CompoundFile CompoundFile { get;  }
-        IDirectoryEntry ChildDirectoryEntry { get; set; }
-        ColorFlag ColorFlag { get;  }
-        DirectoryEntryObjectType ObjectType { get;  }
-        String Name { get; set; }
+        uint StartingSectorLocation { get; set; }
+        ulong StreamSize { get; set; }
+        byte[] ModifiedTime { get; set; }
+        byte[] CreationTime { get; set; }
+        byte[] StateBits { get; set; }
+        byte[] CLSID { get; set; }
+        StreamID ChildID { get; set; }
+        StreamID LeftSiblingID { get; set; }
+        StreamID RightSiblingID { get; set; }
+        RedBlackDirectoryTree ChildRedBlackDirectoryTree { get; set; }
+        DirectoryEntry LeftSiblingDirectoryEntry { get; set; }
+        DirectoryEntry RightSiblingDirectoryEntry { get; set; }
+        DirectoryEntry ParentDirectoryEntry { get; set; }
+        CompoundFile CompoundFile { get; }
+        ColorFlag ColorFlag { get; set; }
+        DirectoryEntryObjectType ObjectType { get; }
+        DirectoryEntryName Name { get; set; }
         
             
     }

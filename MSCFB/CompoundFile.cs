@@ -19,7 +19,7 @@ namespace MSCFB
         public FatChain FatChain { get; private set; }
         public DifatChain DifatChain { get; private set; }
         public DirectoryChain DirectoryChain { get; private set; }
-        public RootDirectoryEntry RootDirectoryEntry { get; private set; }
+        public DirectoryEntry RootDirectoryEntry { get; private set; }
         public bool CanWrite { get; private set; }
         public MiniFatChain MiniFatChain { get; private set; }
         public CompoundFile(Stream fileStream)
@@ -41,8 +41,11 @@ namespace MSCFB
             Header = new CompoundFileHeader(FileReader);
             DifatChain = new DifatChain(this);
             FatChain = new FatChain(this);
-            RootDirectoryEntry = new RootDirectoryEntry(this);
-
+            RootDirectoryEntry = DirectoryEntryFactory.LoadDirectoryEntry(this, 0, null);
+            RootDirectoryEntry.ChildRedBlackDirectoryTree = new RedBlackDirectoryTree(RootDirectoryEntry);
+            MiniFatChain = new MiniFatChain(this);
+            var d = MiniFatChain.ToList();
+            RootDirectoryEntry.ChildRedBlackDirectoryTree.Insert(new DirectoryEntry() {Name = "SomeSubstringThing"});
             return;
         }
         public void Seek(long offset, SeekOrigin origin)
