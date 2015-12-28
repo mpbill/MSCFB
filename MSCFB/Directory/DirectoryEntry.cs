@@ -1,4 +1,5 @@
-﻿using MSCFB.Enum;
+﻿using System;
+using MSCFB.Enum;
 
 namespace MSCFB.Directory
 {
@@ -40,6 +41,20 @@ namespace MSCFB.Directory
             return !(one == two);
         }
 
-        
+        public static bool operator <(DirectoryEntry one, DirectoryEntry two)
+        {
+            if(ReferenceEquals(null, one) || ReferenceEquals(null, two))
+                throw new NullReferenceException();
+            return one.CompareTo(two) < 0;
+            
+        }
+
+        public static bool operator >(DirectoryEntry one, DirectoryEntry two)
+        {
+            if (ReferenceEquals(null, one) || ReferenceEquals(null, two))
+                throw new NullReferenceException();
+            return one.CompareTo(two) > 0;
+            
+        }
     }
 }
